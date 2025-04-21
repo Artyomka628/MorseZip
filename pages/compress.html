@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Сжатие текста</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Сжать текст</h1>
+  <p>Введите текст или загрузите файл .txt</p>
+
+  <form id="compress-form">
+    <textarea id="text-input" placeholder="Введите текст здесь..."></textarea>
+    <br>
+    <input type="file" id="file-input" accept=".txt">
+    <br>
+    <button type="submit">Сжать</button>
+  </form>
+
+  <section>
+    <a href="index.html" class="button">На главную</a>
+  </section>
+
+  <script>
+    const apiUrl = 'https://your-pythonanywhere-username.pythonanywhere.com';
+
+    document.getElementById('compress-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const text = document.getElementById('text-input').value;
+      const file = document.getElementById('file-input').files[0];
+      const formData = new FormData();
+
+      if (text.trim()) {
+        const blob = new Blob([text], { type: 'text/plain' });
+        formData.append('file', blob, 'text.txt');
+      } else if (file) {
+        formData.append('file', file);
+      } else {
+        alert('Введите текст или выберите файл');
+        return;
+      }
+
+      try {
+        const res = await fetch(apiUrl + '/compress', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const blob = await res.blob();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'compressed.mztf';
+        a.click();
+      } catch (err) {
+        alert('Ошибка: ' + err.message);
+      }
+    });
+  </script>
+</body>
+</html>

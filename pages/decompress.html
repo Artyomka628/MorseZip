@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Распаковка текста</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <h1>Распаковать файл</h1>
+  <p>Выберите файл .mztf для распаковки</p>
+
+  <form id="decompress-form">
+    <input type="file" id="file-input" accept=".mztf" required>
+    <br>
+    <button type="submit">Распаковать</button>
+  </form>
+
+  <textarea id="output" readonly placeholder="Здесь появится текст..."></textarea>
+
+  <section>
+    <a href="index.html" class="button">На главную</a>
+  </section>
+
+  <script>
+    const apiUrl = 'https://your-pythonanywhere-username.pythonanywhere.com';
+
+    document.getElementById('decompress-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const file = document.getElementById('file-input').files[0];
+      if (!file) return;
+      const formData = new FormData();
+      formData.append('file', file);
+
+      const output = document.getElementById('output');
+      output.value = 'Распаковываем...';
+
+      try {
+        const res = await fetch(apiUrl + '/decompress', {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) throw new Error(await res.text());
+        const text = await res.text();
+        output.value = text;
+      } catch (err) {
+        output.value = 'Ошибка: ' + err.message;
+      }
+    });
+  </script>
+</body>
+</html>
